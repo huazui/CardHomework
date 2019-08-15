@@ -1,0 +1,165 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>08.layout</title>
+    <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
+    <script type="text/javascript" src="../../adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="../../ext-all.js"></script>
+    <script type="text/javascript" src="localXHR.js"></script>
+    <style type="text/css">
+        * {
+            font-size: 12px;
+        }
+    </style>
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            var question1_lists = [{ boxLabel: '湿垃圾', name: 'rubbish', inputValue: 1 },
+            { boxLabel: '干垃圾', name: 'rubbish', inputValue: 2 },
+            { boxLabel: '有害垃圾', name: 'rubbish', inputValue: 3 },
+            { boxLabel: '可回收垃圾', name: 'rubbish', inputValue: 4 }]
+            var question50_lists = [
+                { boxLabel: '把粑粑用废纸包好带回家冲掉', name: 'action', inputValue: 1 },
+                { boxLabel: '受污染的报纸按有害垃圾处理', name: 'action', inputValue: 2 },
+                { boxLabel: '没受污染的报纸按可回收垃圾处理', name: 'action', inputValue: 3 },
+                { boxLabel: '受污染的报纸浸水后当湿垃圾处理', name: 'action', inputValue: 4 }
+            ]
+            var question1_answer = '';
+            var question50_answer = '';
+           
+
+            var form = new Ext.form.FormPanel({
+                title: '请确认您的答案',
+                labelWidth: 50,
+                frame: true,
+                // url: 'form2.jsp',
+                width: 280,
+
+                items: [{
+                    id: 'firstAnswer',
+                    xtype: 'textarea',
+                    fieldLabel: '第一个题目的答案',
+                 
+                    // html: question1_anwser,
+                    name: 'text'
+                }, {
+                    id: 'secondAnswer',
+                    xtype: 'textarea',
+                    fieldLabel: '第二个题目的答案',
+                   
+                    // html: question50_anwser
+                }],
+                buttons: [{
+                    text: 'submit',
+                    handler: function () {
+                        Ext.Msg.alert("Congratuate!")
+                    }
+                }]
+                
+            });
+            var navHandler = function (direction) {
+
+                var wizard = Ext.getCmp('wizard').layout;
+                var prev = Ext.getCmp('move-prev');
+                var next = Ext.getCmp('move-next');
+                var activeId = wizard.activeItem.id;
+
+                if (activeId == 'card-0') {
+                    if (direction == 1) {
+                        wizard.setActiveItem(1);
+                        prev.setDisabled(false);
+                        let questionOne = Ext.getCmp('questionOne').getForm().getValues().rubbish;
+                        for(let i= 0; i<4; i++){
+                            if(parseInt(questionOne )==parseInt( question1_lists[i].inputValue)){
+                            
+                                Ext.getCmp('firstAnswer').setValue( question1_lists[i].boxLabel);
+                            }
+                        }
+                    }
+                } else if (activeId == 'card-1') {
+                    if (direction == -1) {
+                        wizard.setActiveItem(0);
+                        prev.setDisabled(true);
+                    } else {
+                        let answer = '';
+                        wizard.setActiveItem(2);
+                        next.setDisabled(true);
+                        let question2 = Ext.getCmp('secondQuestion').getForm().getValues().action;
+                        for(let i= 0; i<4; i++){
+                            for(let j = 0;j<question2.length;j++)
+                                  if(parseInt(question2[j] )==parseInt( question50_lists[i].inputValue)){
+                                   answer +=  question50_lists[i].boxLabel+'\n';
+                            }
+                        }
+                        Ext.getCmp('secondAnswer').setValue(answer); 
+                    }
+                } else if (activeId == 'card-2') {
+                    if (direction == -1) {
+                        wizard.setActiveItem(1);
+                        next.setDisabled(false);
+                    }
+                }
+            };
+
+
+            var viewport = new Ext.Viewport({
+                // layout:'border',
+                items: [{
+                    // region: 'west',
+                    id: 'wizard',
+                    width: 400,
+                    height: 300,
+                    title: '做题',
+                    layout: 'card',
+                    activeItem: 0,
+                    bodyStyle: 'padding:15px',
+                    defaults: {
+                        border: false
+                    },
+                    bbar: [{
+                        id: 'move-prev',
+                        text: '上一步',
+                        handler: navHandler.createDelegate(this, [-1]),
+                        disabled: true
+                    }, '->', {
+                        id: 'move-next',
+                        text: '下一步',
+                        handler: navHandler.createDelegate(this, [1])
+                    }],
+                    items: [{
+                        id: 'card-0',
+                        items: [{
+                            xtype: 'form',
+                            id: 'questionOne',
+                            title: 'Q1:番茄酱属于以下哪种垃圾？（单选）',
+                            defaultType: 'radio',
+                            items: question1_lists
+                        }]
+                    }, {
+                        id: 'card-1',
+                        items: [{
+                            id: 'secondQuestion',
+                            xtype: 'form',
+                            title: 'Q50:王大叔出门遛狗后，哪些是正确处理狗粑粑的方法？（多选）',
+                            defaultType: 'checkbox',
+                            items: question50_lists
+                        }
+                        ]
+                    }, {
+                        id: 'card-2',
+                        items: form
+                    }]
+                },
+
+                ]
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
