@@ -2,11 +2,11 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>08.layout</title>
+    <title>card-2.layout</title>
     <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
     <script type="text/javascript" src="../../adapter/ext/ext-base.js"></script>
     <script type="text/javascript" src="../../ext-all.js"></script>
-    <script type="text/javascript" src="localXHR.js"></script>
+    <!-- <script type="text/javascript" src="localXHR.js"></script> -->
     <style type="text/css">
         * {
             font-size: 12px;
@@ -24,6 +24,7 @@
                 { boxLabel: '没受污染的报纸按可回收垃圾处理', name: 'action', inputValue: 3 },
                 { boxLabel: '受污染的报纸浸水后当湿垃圾处理', name: 'action', inputValue: 4 }
             ]
+            
             var question1_answer = '';
             var question50_answer = '';
            
@@ -84,13 +85,25 @@
                         let answer = '';
                         wizard.setActiveItem(2);
                         next.setDisabled(true);
-                        let question2 = Ext.getCmp('secondQuestion').getForm().getValues().action;
-                        for(let i= 0; i<4; i++){
-                            for(let j = 0;j<question2.length;j++)
-                                  if(parseInt(question2[j] )==parseInt( question50_lists[i].inputValue)){
-                                   answer +=  question50_lists[i].boxLabel+'\n';
+                        // let question2 = Ext.getCmp('secondQuestion').getForm().getValues().action;
+                        // for(let i= 0; i<4; i++){
+                        //     for(let j = 0;j<question2.length;j++)
+                        //           if(parseInt(question2[j] )==parseInt( question50_lists[i].inputValue)){
+                        //            answer +=  question50_lists[i].boxLabel+'\n';
+                        //     }
+                        // }
+             //尽管数组很小，但是也要时刻考虑算法效率.....           
+                     let answers = Ext.getCmp('secondQuestion').getForm().getValues().action;
+                     let index = 0;
+                     for(let i= 0; i < answers.length; i++ ){
+                            for(let j = index ; j < 4 ; j++)
+                                  if(parseInt(answers[i] )==parseInt( question50_lists[j].inputValue)){
+                                   answer +=  question50_lists[j].boxLabel+'\n';
+                                   index = j+1;
+                                   break;
                             }
                         }
+                    
                         Ext.getCmp('secondAnswer').setValue(answer); 
                     }
                 } else if (activeId == 'card-2') {
@@ -121,7 +134,9 @@
                         text: '上一步',
                         handler: navHandler.createDelegate(this, [-1]),
                         disabled: true
-                    }, '->', {
+                    }, 
+                    '->', 
+                    {
                         id: 'move-next',
                         text: '下一步',
                         handler: navHandler.createDelegate(this, [1])
