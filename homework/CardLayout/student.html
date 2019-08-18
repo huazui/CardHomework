@@ -1,0 +1,196 @@
+<html>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="../../resources/css/ext-all.css" />
+        <script type="text/javascript" src="../../adapter/ext/ext-base.js"></script>
+        <script type="text/javascript" src="../../ext-all.js"></script>
+        <script type="text/javascript">
+Ext.onReady(function(){
+    const menu = new Ext.menu.Menu({
+        items:[
+            {
+            id:'showDetail',
+            text:'show detail about it'
+            },{
+            id : 'delete',
+            text : 'delete it'
+        },{
+            id : 'add',
+            text : 'add a new node as it'
+        }],
+   
+    listeners:{
+        itemclick : function (item){
+            const currentNode = item.parentMenu.contextNode;
+            if(item.id === 'showDetail'){
+                Ext.Msg.alert('message',currentNode.text);
+                return;
+            }
+            if(item.id === 'delete'){
+                if(currentNode.text == 'allClass'){
+                    Ext.Msg.alert('message','you can\'t delete all classes');
+                    return;
+                }
+                currentNode.remove();
+                if(currentNode.leaf){
+                    Ext.Msg.alert('message','you delete a student');
+                }
+                else Ext.Msg.alert('message','you delete a class');
+                return;
+            }
+            if(item.id === 'add'){
+                if(currentNode.text == 'allClass'){
+                    currentNode.appendChild(
+                        new Ext.tree.TreeNode({text:'a new class'})
+                        
+                    );
+                    Ext.Msg.alert('message','you add a class');
+                    return;
+                }
+                if(currentNode.leaf){
+                     currentNode.parentNode.appendChild(
+                         new Ext.tree.TreeNode({text :'a new student',
+                         leaf : true}));
+                         Ext.Msg.alert('message','you add a student to '+currentNode.parentNode.text);  
+                         return;   
+                }
+                else{
+                    currentNode.appendChild(
+                        new Ext.tree.TreeNode({text :'a new student',
+                        leaf : true})
+                    );
+                    Ext.Msg.alert('message','you add a student to '+currentNode.text); 
+                    return;
+                } 
+                }
+            }
+        }
+    }
+);
+
+    var root = new Ext.tree.TreeNode({text:'allClass'});
+    
+    var tree = new Ext.tree.TreePanel({
+        
+        text:'manageSystem',
+          width:'100%',
+          height:500,
+        //  el:'tree',
+         enableDD:true,
+        root:root,
+        contextMenu:menu,
+        listeners : {
+            contextmenu:function(node,e){
+                node.select();
+                const treeContextMenu = node.getOwnerTree().contextMenu; 
+                treeContextMenu.contextNode = node;
+                treeContextMenu.showAt(e.getXY());
+            }
+        }
+     });
+ 
+ 
+     var class1 = new Ext.tree.TreeNode({text:'class1'});
+     var class2 = new Ext.tree.TreeNode({text:'class2'});
+     var class3 = new Ext.tree.TreeNode({text:'class3'});
+ 
+     root.appendChild(class2);
+     root.appendChild(class1);
+     root.appendChild(class3);
+     class1.appendChild(new Ext.tree.TreeNode({
+         text:'studentZhang',
+         leaf:true}));
+     class2.appendChild(new Ext.tree.TreeNode({
+         text:'studentLi',
+         leaf:true}));    
+    
+     var treeEditor = new Ext.tree.TreeEditor(tree, {
+        allowBlank: false
+    },{
+        listeners:{
+            complete:function(editor,currVal,origVal){
+                Ext.Msg.alert('change '+origVal+' to '+currVal);
+            }
+        }
+    });
+    var listenNode;
+
+    tree.on("click", function(node){
+       listenNode = node; 
+    });
+    var form = new Ext.form.FormPanel({
+         
+            id:'testForm',
+            defaultType:'textfield',
+            labelAlign:'right',
+            title:'add a student or class',
+            labelWidth:100,
+            buttonAlign:'center',
+            frame:true,
+            width:400,
+            items:[{
+                id:'inputMessage',
+                fieldLabel:'Please Input',
+                name:'text'
+            }],
+            buttons:[{
+                text:'submit',
+                handler:function(){
+                    if(listenNode.text == 'allClass'){
+                        listenNode.appendChild(new Ext.tree.TreeNode({
+                        text:Ext.getCmp('inputMessage').getValue()}));
+                        return;
+
+                    }
+                    if(listenNode.leaf){
+                    listenNode.parentNode.appendChild(new Ext.tree.TreeNode({
+                        text:Ext.getCmp('inputMessage').getValue(),
+                        leaf:true
+                    }))
+                    }
+                    else {
+                        listenNode.appendChild(new Ext.tree.TreeNode({
+                        text:Ext.getCmp('inputMessage').getValue(),
+                        leaf:true
+                    }))
+                    }
+                   
+                }
+            },
+            ]
+
+        });
+
+
+    var panel = new Ext.Panel({
+        renderTo :tre,
+    layout: 'border',
+    width: 800,
+      height:500,
+    items: [
+      {
+      region:'west',
+      html:'west',
+      width: 200,
+      height:500,
+      xType : panel,
+      items :[tree]
+      },
+      {
+     region:'center',
+     html:'这是待开发的其他功能模块',
+     width: 600,
+      height:500,
+      items:[form]
+         }
+    ]
+  });
+
+    
+})
+</script>
+<body>
+    <div id ='tre'></div>
+    
+</body>
+</html>
+
